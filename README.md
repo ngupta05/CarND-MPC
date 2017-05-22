@@ -34,7 +34,7 @@ Code and following instructions based on stub code and readme provided by udacit
   * Windows: TODO. If you can use the Linux subsystem and follow the Linux instructions.
 * [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). This is already part of the repo so you shouldn't have to worry about it.
 * Simulator. You can download these from the [releases tab](https://github.com/udacity/CarND-MPC-Project/releases).
-
+* Not a dependency but read the [DATA.md](./DATA.md) for a description of the data sent back from the simulator.
 
 
 ## Basic Build Instructions
