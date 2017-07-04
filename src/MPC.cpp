@@ -7,7 +7,7 @@ using CppAD::AD;
 
 // TODO: Set the timestep length and duration
 size_t N = 10;
-double dt = 0.5;
+double dt = 0.4;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -52,14 +52,6 @@ public:
 		fg[1 + cte_start] = vars[cte_start];
 		fg[1 + epsi_start] = vars[epsi_start];
 
-		// Add to cost
-		for (unsigned int t = 0; t < N; t++) {
-			fg[0] += 100 * CppAD::pow(vars[cte_start + t], 2);
-			fg[0] += 100 * CppAD::pow(vars[epsi_start + t], 2);
-			fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
-		}
-
-
 		// The rest of the constraints
 		for (unsigned int t = 1; t < N; t++) {
 			AD<double> x1 = vars[x_start + t];
@@ -94,6 +86,13 @@ public:
 			fg[1 + epsi_start + t] = epsi1 - ((psi0 - psides0) + (v0/Lf)*dt*delta0);
 		}
 
+		// Add to cost
+		for (unsigned int t = 0; t < N; t++) {
+			fg[0] += 100 * CppAD::pow(vars[cte_start + t], 2);
+			fg[0] += 100 * CppAD::pow(vars[epsi_start + t], 2);
+			fg[0] += 0.2 * CppAD::pow(vars[v_start + t] - ref_v, 2);
+		}
+
 		// Cost to smoothen out transition
 		for (unsigned int t = 0; t < N - 1; t++) {
 			fg[0] += CppAD::pow(vars[delta_start + t], 2);
@@ -102,8 +101,8 @@ public:
 
 		// Cost to smoothen out changes in actuations
 		for (unsigned int t = 0; t < N - 2; t++) {
-			fg[0] += 100 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2); // TODO
-			fg[0] += 100 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2); // TODO
+			fg[0] += 10 * CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2); // TODO
+			fg[0] += 10 * CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2); // TODO
 		}
 	}
 };
@@ -232,12 +231,12 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 
 	// Cost
 	// auto cost = solution.obj_value;
-    if (ok) {
-	return {solution.x[x_start + N - 1],   solution.x[y_start + N - 1],
-		solution.x[psi_start + 1], solution.x[v_start + 1],
-		solution.x[cte_start + 1], solution.x[epsi_start + 1],
-		solution.x[delta_start],   solution.x[a_start]};
-    } else {
-    	return {};
-    }
+	if (ok) {
+		return {solution.x[x_start + N - 1],   solution.x[y_start + N - 1],
+			solution.x[psi_start + 1], solution.x[v_start + 1],
+			solution.x[cte_start + 1], solution.x[epsi_start + 1],
+			solution.x[delta_start],   solution.x[a_start]};
+	} else {
+		return {};
+	}
 }
